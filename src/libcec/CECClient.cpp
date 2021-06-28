@@ -1030,6 +1030,11 @@ void CCECClient::AddKey(bool bSendComboKey /* = false */, bool bButtonRelease /*
 
   if (key.keycode != CEC_USER_CONTROL_CODE_UNKNOWN)
   {
+    if (bButtonRelease && key.duration < 1)
+    {
+      key.duration = 1;
+    }
+
     LIB_CEC->AddLog(CEC_LOG_DEBUG, "key released: %s (%1x) D:%dms", ToString(key.keycode), key.keycode, key.duration);
     QueueAddKey(key);
   }
@@ -1168,7 +1173,7 @@ uint16_t CCECClient::CheckKeypressTimeout(void)
     else if (m_iCurrentButton != comboKey && m_releaseButtontime && iNow >= (uint64_t)m_releaseButtontime)
     {
       key.duration = (unsigned int) (iNow - m_initialButtontime);
-      key.keycode = CEC_USER_CONTROL_CODE_UNKNOWN;
+      key.keycode = m_iCurrentButton;
 
       m_iCurrentButton = CEC_USER_CONTROL_CODE_UNKNOWN;
       m_initialButtontime = 0;
